@@ -44,6 +44,7 @@ router.post(
 				},
 			}
 
+			// Get the token
 			jwt.sign(
 				payload,
 				config.get('jwtSecret'),
