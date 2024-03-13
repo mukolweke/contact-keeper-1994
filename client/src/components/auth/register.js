@@ -1,9 +1,16 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import AlertContext from '../../context/alert/alertContext'
+import AuthContext from '../../context/auth/authContext'
 
 const Register = () => {
 	const alertContext = useContext(AlertContext)
+	const authContext = useContext(AuthContext)
 	const { setAlert } = alertContext
+	const { register, error, clearErrors, isAuthenticated } = authContext
+
+	const navigate = useNavigate()
 
 	const [user, setUser] = useState({
 		name: '',
@@ -11,6 +18,18 @@ const Register = () => {
 		password: '',
 		password_confirm: '',
 	})
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate('/')
+		}
+
+		if (error && error !== '') {
+			setAlert(error, 'danger')
+			clearErrors()
+		}
+		// eslint-disable-next-line
+	}, [error, isAuthenticated])
 
 	const { name, email, password, password_confirm } = user
 
@@ -28,8 +47,11 @@ const Register = () => {
 		} else if (!emailPattern.test(email)) {
 			setAlert('Please provide a valid email address', 'danger')
 		} else {
-			console.log('Register submit')
-			// Implement your registration logic here
+			register({
+				name,
+				email,
+				password,
+			})
 		}
 	}
 

@@ -1,10 +1,33 @@
-import React, { useState } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+
+import AlertContext from '../../context/alert/alertContext'
+import AuthContext from '../../context/auth/authContext'
 
 const Login = () => {
+	const alertContext = useContext(AlertContext)
+	const authContext = useContext(AuthContext)
+	const { setAlert } = alertContext
+	const { login, error, clearErrors, isAuthenticated } = authContext
+
+	const navigate = useNavigate()
+
 	const [user, setUser] = useState({
 		email: '',
 		password: '',
 	})
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate('/')
+		}
+
+		if (error && error !== '') {
+			setAlert(error, 'danger')
+			clearErrors()
+		}
+		// eslint-disable-next-line
+	}, [error, isAuthenticated])
 
 	const { email, password } = user
 
@@ -12,7 +35,19 @@ const Login = () => {
 
 	const onSubmit = (e) => {
 		e.preventDefault()
-		console.log('login submit')
+
+		const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+		if (email === '' || password === '') {
+			setAlert('Please enter all fields', 'danger')
+		} else if (!emailPattern.test(email)) {
+			setAlert('Please provide a valid email address', 'danger')
+		} else {
+			login({
+				email,
+				password,
+			})
+		}
 	}
 	return (
 		<div className='form-container'>

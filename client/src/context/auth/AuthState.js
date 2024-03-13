@@ -1,6 +1,11 @@
 import React, { useReducer } from 'react'
+import axios from 'axios'
+
+import setAuthToken from '../../utils/setAuthToken'
+
 import AuthContext from './authContext'
 import AuthReducer from './authReducer'
+
 import {
 	REGISTER_SUCCESS,
 	REGISTER_FAIL,
@@ -25,20 +30,55 @@ const AuthState = (props) => {
 
 	// Load User
 	const loadUser = async () => {
-		// Implement your logic here to load user data from backend
-		// Dispatch USER_LOADED if successful, AUTH_ERROR if failed
+		if (localStorage.getItem('token')) {
+			setAuthToken(localStorage.getItem('token'))
+		}
+
+		console.log(localStorage.getItem('token'))
+
+		try {
+			const res = await axios.get('/api/auth')
+
+			dispatch({ type: USER_LOADED, payload: res.data })
+		} catch (err) {
+			dispatch({ type: AUTH_ERROR })
+		}
 	}
 
 	// Register User
 	const register = async (formData) => {
-		// Implement your logic here to register a user
-		// Dispatch REGISTER_SUCCESS if successful, REGISTER_FAIL if failed
+		// register a user
+		const config = {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}
+
+		try {
+			const res = await axios.post('/api/users', formData, config)
+			dispatch({ type: REGISTER_SUCCESS, payload: res.data })
+			loadUser()
+		} catch (err) {
+			dispatch({ type: REGISTER_FAIL, payload: err.response.data.msg })
+		}
 	}
 
 	// Login User
 	const login = async (formData) => {
-		// Implement your logic here to login a user
-		// Dispatch LOGIN_SUCCESS if successful, LOGIN_FAIL if failed
+		// register a user
+		const config = {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}
+
+		try {
+			const res = await axios.post('/api/auth', formData, config)
+			dispatch({ type: LOGIN_SUCCESS, payload: res.data })
+			loadUser()
+		} catch (err) {
+			dispatch({ type: LOGIN_FAIL, payload: err.response.data.msg })
+		}
 	}
 
 	// Logout User
@@ -49,7 +89,7 @@ const AuthState = (props) => {
 
 	// Clear Errors
 	const clearErrors = () => {
-		// Dispatch CLEAR_ERRORS
+		dispatch({ type: CLEAR_ERRORS })
 	}
 
 	return (
