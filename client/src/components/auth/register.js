@@ -1,6 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
+import AlertContext from '../../context/alert/alertContext'
 
 const Register = () => {
+	const alertContext = useContext(AlertContext)
+	const { setAlert } = alertContext
+
 	const [user, setUser] = useState({
 		name: '',
 		email: '',
@@ -12,10 +16,23 @@ const Register = () => {
 
 	const onChange = (e) => setUser({ ...user, [e.target.name]: e.target.value })
 
-    const onSubmit = (e) => {
-        e.preventDefault();
-        console.log('register submit')
-    }
+	const onSubmit = (e) => {
+		e.preventDefault()
+
+		const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+		if (name === '' || email === '' || password === '') {
+			setAlert('Please enter all fields', 'danger')
+		} else if (password !== password_confirm) {
+			setAlert('Passwords do not match', 'danger')
+		} else if (!emailPattern.test(email)) {
+			setAlert('Please provide a valid email address', 'danger')
+		} else {
+			console.log('Register submit')
+			// Implement your registration logic here
+		}
+	}
+
 	return (
 		<div className='form-container'>
 			<h1>
@@ -36,7 +53,7 @@ const Register = () => {
 				<div className='form-group'>
 					<label htmlFor='email'>Email:</label>
 					<input
-						type='email'
+						type='text'
 						name='email'
 						id='email'
 						value={email}
@@ -51,6 +68,7 @@ const Register = () => {
 						id='password'
 						value={password}
 						onChange={onChange}
+						minLength='6'
 					/>
 				</div>
 				<div className='form-group'>
@@ -61,6 +79,7 @@ const Register = () => {
 						id='password_confirm'
 						value={password_confirm}
 						onChange={onChange}
+						minLength='6'
 					/>
 				</div>
 
