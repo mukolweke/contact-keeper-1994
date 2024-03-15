@@ -1,2 +1,25 @@
-# contact-keeper-1994
-Contact manager using React hooks &amp; context
+# Contact Keeper
+Full stack MERN contact manager with React hooks, context & JWT authentication.
+
+[Live Demo](https://whispering-mountain-19435-9fe104ee4d9d.herokuapp.com/)
+
+## Usage
+Install dependencies
+
+```
+npm install
+cd client
+npm install
+```
+
+## Mongo connection setup
+```
+Edit your /config/default.json file to include the correct MongoDB URI
+```
+
+## Run Server
+```
+npm run dev     # Express & React :3000 & :5000
+npm run server  # Express API Only :5000
+npm run client  # React Client Only :3000
+```
