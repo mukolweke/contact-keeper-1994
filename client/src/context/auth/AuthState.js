@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import axios from 'axios'
 
 import setAuthToken from '../../utils/setAuthToken'
@@ -20,7 +20,7 @@ import {
 const AuthState = (props) => {
 	const initialState = {
 		token: localStorage.getItem('token'),
-		isAuthenticated: null,
+		isAuthenticated: false,
 		loading: true,
 		error: null,
 		user: null,
@@ -28,14 +28,11 @@ const AuthState = (props) => {
 
 	const [state, dispatch] = useReducer(AuthReducer, initialState)
 
+	// set token on initial app loading
+	setAuthToken(state.token)
+
 	// Load User
 	const loadUser = async () => {
-		if (localStorage.getItem('token')) {
-			setAuthToken(localStorage.getItem('token'))
-		}
-
-		console.log(localStorage.getItem('token'))
-
 		try {
 			const res = await axios.get('/api/auth')
 
@@ -75,7 +72,7 @@ const AuthState = (props) => {
 		try {
 			const res = await axios.post('/api/auth', formData, config)
 			dispatch({ type: LOGIN_SUCCESS, payload: res.data })
-			loadUser()
+			// loadUser()
 		} catch (err) {
 			dispatch({ type: LOGIN_FAIL, payload: err.response.data.msg })
 		}
@@ -83,14 +80,23 @@ const AuthState = (props) => {
 
 	// Logout User
 	const logout = () => {
-		// Implement your logic here to logout a user
-		// Dispatch LOGOUT
+		dispatch({ type: LOGOUT })
 	}
 
 	// Clear Errors
 	const clearErrors = () => {
 		dispatch({ type: CLEAR_ERRORS })
 	}
+
+	// load user on first run or refresh
+	if (state.loading) {
+		loadUser()
+	}
+
+	// 'watch' state.token and set headers and local storage on any change
+	useEffect(() => {
+		setAuthToken(state.token)
+	}, [state.token])
 
 	return (
 		<AuthContext.Provider
